@@ -1,3 +1,9 @@
+# TODO
+
+ - [x] Add engine support.
+ - [ ] Create common storage interface.
+ - [ ] Add controller/view structure for web interface and templates.
+
 # Coverband
 
 [![Build Status](https://travis-ci.org/danmayer/coverband.svg?branch=master)](https://travis-ci.org/danmayer/coverband)
@@ -107,12 +113,12 @@ Rails.application.routes.draw do
   # ... lots of routes
 
   # Create a Rack wrapper around the Coverband Web Reporter to support & prompt the user for basic authentication.
-  AuthenticatedCoverband = Rack::Builder.new do 
+  AuthenticatedCoverband = Rack::Builder.new do
     use Rack::Auth::Basic do |username, password|
       username == 'foo' && password == 'bar'
     end
 
-    run Coverband::Reporters::Web.new 
+    run Coverband::Reporters::Web.new
   end
 
   # Connect the wrapper app to your desired endpoint.
@@ -151,7 +157,7 @@ The web endpoint is a barebones endpoint that you can either expose direct (afte
 ![image](https://raw.github.com/danmayer/coverband/master/docs/coverband_web.png)
 > The web index as available on the Coverband Demo site
 
-* __collect data, update report, & view:__ This does everything need to view up to date Coverage 
+* __collect data, update report, & view:__ This does everything need to view up to date Coverage
    * it triggers a coverage collection on the current webserver process
    * it generates a new html coverage report and pushes it to S3
    * it then loads that report for you to view
@@ -232,6 +238,19 @@ Now that Coverband uses MD5 hashes there should be no reason to manually clear c
 
 `rake coverband:clear`
 
+### Rails Engine Support
+
+Rails engines are supported by setting a configuration option. The `engine_root` option
+allows you to provide the relative path to your directory containing local engines.
+For example if you have a couple engines in a sub-folder called `engines` you would
+just set the path to `engines`.
+
+```ruby
+Coverband.configure do |config|
+  config.engine_root = 'path/to/engines'
+end
+```
+
 ### Adding Rake Tasks outside of Rails
 
 Rails apps should automaticallly include the tasks via the Railtie.
@@ -254,7 +273,7 @@ rake coverband:coverage      # report runtime coverband code coverage
 
 ### Forcing Coverband to Track Coverage on files loaded during boot `safe_reload_files`
 
-The way Coverband is built it will record and report code usage in production for anything `required` or `loaded` after calling `Coverband.start`. This means some of Rails initial files and Gems are loaded before you can generally call `Coverband.start` for example if you use the `application.rb` to initialize and start Coverband, that file will be reported as having no coverage, as it can't possibly start Coverband before the file is loaded. 
+The way Coverband is built it will record and report code usage in production for anything `required` or `loaded` after calling `Coverband.start`. This means some of Rails initial files and Gems are loaded before you can generally call `Coverband.start` for example if you use the `application.rb` to initialize and start Coverband, that file will be reported as having no coverage, as it can't possibly start Coverband before the file is loaded.
 
 The `safe_reload_files` reload option in the configuration options can help to ensure you can track any files you want regardless of them loading before Coverband. For example if I wanted to show the coverage of `config/coverband.rb` which has to be loaded before calling `Coverband.start` I could do that by adding that path to the `safe_reload_files` option.
 
@@ -350,12 +369,12 @@ If you are working on adding features, PRs, or bugfixes to Coverband this sectio
 
 If you submit a change please make sure the tests and benchmarks are passing.
 
-* run tests: 
-   * `bundle exec rake` 
+* run tests:
+   * `bundle exec rake`
    * `BUNDLE_GEMFILE=Gemfile.rails4 bundle exec rake` (Same tests using rails 4 instead of 5)
 * view test coverage: `open coverage/index.html`
 * run the benchmarks before and after your change to see impact
-   * `rake benchmarks` 
+   * `rake benchmarks`
 
 ### Known Issues
 
